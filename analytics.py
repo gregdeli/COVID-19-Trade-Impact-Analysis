@@ -13,7 +13,7 @@ data = StringIO(req.text)
 df = pd.read_csv(data)
 
 # Create the graphs
-def create_graph(df, groupby_col, measure, title):
+def create_graph(df, groupby_col, measure, title, country=None):
     df_grouped = df[df['Measure'] == measure].groupby(groupby_col)['Value'].sum().reset_index()
     #gia na einai taksinomimenoi oi mhnes sto erwt. 1
     if groupby_col == 'Month':
@@ -23,8 +23,11 @@ def create_graph(df, groupby_col, measure, title):
     plt.title(f"{title} ({measure})")
     plt.xticks(rotation=0)
     plt.tight_layout()
-    plt.savefig(f"{title} ({measure}).png")
-    #plt.show()
+    if country:
+        plt.savefig(f"{title} ({measure}) - {country}.png")
+    else:
+        plt.savefig(f"{title} ({measure}).png")
+    plt.show()
 
 
 # Total turnover presentation (value column) per month
@@ -50,3 +53,33 @@ create_graph(df, 'Weekday', 'Tonnes', 'Total turnover per weekday')
 create_graph(df, 'Commodity', '$', 'Total turnover per commodity')
 create_graph(df, 'Commodity', 'Tonnes', 'Total turnover per commodity')
 
+# Presentation of the 5 months with the highest turnover
+def create_top5_graph(df, groupby_col, measure, title):
+    df_grouped = df[df['Measure'] == measure].groupby(groupby_col)['Value'].sum().nlargest(5).reset_index()
+    if groupby_col == 'Month':
+        df_grouped['Month'] = pd.Categorical(df_grouped['Month'], categories=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], ordered=True)
+        df_grouped = df_grouped.sort_values('Month')
+    plt.figure(figsize=(10,6))
+    sns.barplot(x=groupby_col, y='Value', data=df_grouped)
+    plt.title(f"{title} ({measure})")
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.savefig(f"{title} ({measure}).png")
+    #plt.show()
+
+create_top5_graph(df, 'Month', '$', 'Top 5 months with highest turnover')
+create_top5_graph(df, 'Month', 'Tonnes', 'Top 5 months with highest turnover')
+
+# Presentation of the 5 categories of goods with the highest turnover, for each country
+df_country_commodity = df.groupby(['Country', 'Commodity', 'Measure'])['Value'].sum().reset_index()
+df_country_commodity_top5 = df_country_commodity.groupby(['Country', 'Measure']).apply(lambda x: x.nlargest(5, 'Value')).reset_index(drop=True)
+for country in df_country_commodity_top5['Country'].unique():
+    df_country = df_country_commodity_top5[df_country_commodity_top5['Country'] == country]
+    create_graph(df_country[df_country['Measure'] == '$'], 'Commodity', '$', 'Top 5 commodities with highest turnover', country)
+    create_graph(df_country[df_country['Measure'] == 'Tonnes'], 'Commodity', 'Tonnes', 'Top 5 commodities with highest turnover', country)
+
+# Presentation of the day with the highest turnover, for each category of goods
+df_commodity_day = df.groupby(['Commodity', 'Weekday', 'Measure'])['Value'].sum().reset_index()
+df_commodity_day = df_commodity_day.loc[df_commodity_day.groupby(['Commodity', 'Measure'])['Value'].idxmax()]
+create_graph(df_commodity_day[df_commodity_day['Measure'] == '$'], 'Weekday', '$', 'Day with highest turnover per commodity')
+create_graph(df_commodity_day[df_commodity_day['Measure'] == 'Tonnes'], 'Weekday', 'Tonnes', 'Day with highest turnover per commodity')
