@@ -78,7 +78,7 @@ commodity_country_turnover = data.groupby(['Commodity', 'Country'])['Value'].sum
 top5_commodities_per_country = commodity_country_turnover.sort_values(['Country', 'Value'], ascending=[True, False]).groupby('Country').head(5)
 create_graph(top5_commodities_per_country, 'Top 5 Commodities for each Country', 'Country', 'Value', 'Commodity')
 top5_commodities_per_country.to_sql(name=f"top5_commodities_per_country", con=engine, if_exists='replace', index=False)
-top5_commodities_per_country.to_csv(f"top5_commodities_per_country.csv", index=False)
+top5_commodities_per_country.to_csv(f"csv_files/top5_commodities_per_country.csv", index=False)
 
 # Calculate total turnover for each date for each commodity
 date_commodity_turnover = data.groupby(['Date', 'Commodity'])['Value'].sum().reset_index()
@@ -86,4 +86,4 @@ date_commodity_turnover = data.groupby(['Date', 'Commodity'])['Value'].sum().res
 top_date_per_commodity = date_commodity_turnover.sort_values(['Commodity', 'Value'], ascending=[True, False]).groupby('Commodity').head(1)
 create_graph(top_date_per_commodity, 'Days with the highest Turnovers', 'Date', 'Value', 'Commodity')
 top_date_per_commodity.to_sql(name=f"top_date_per_commodity", con=engine, if_exists='replace', index=False)
-top_date_per_commodity.to_csv(f"top_date_per_commodity.csv", index=False)
+top_date_per_commodity.to_csv(f"csv_files/top_date_per_commodity.csv", index=False)
