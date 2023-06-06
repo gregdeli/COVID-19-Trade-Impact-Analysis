@@ -12,7 +12,7 @@ def load_data(username, password, dbase_name):
     data = pd.read_csv(url) # import data into a pandas data frame
     # Convert Date to datetime
     data['Date'] = pd.to_datetime(data['Date'], format='%d/%m/%Y')
-    
+
     # Create a connection to your MySQL server
     global engine
     engine = create_engine(f"mysql+pymysql://{username}:{password}@localhost:3306/{dbase_name}")
@@ -101,7 +101,7 @@ os.makedirs('graphs', exist_ok=True)
 # Dhmiourgia fakelou me ta csv
 os.makedirs('csv_files', exist_ok=True)
 
-load_data('root', 'giagia12', 'covid_19_data')
+load_data('root', '12345678', 'dbase-name')
 
 # GUI Menu 
 
@@ -138,7 +138,6 @@ button10.pack()
 button11.pack()
 button12.pack()
 button13.pack()
-# And so on for all your buttons...
 
 # Start the event loop
 window.mainloop()
