@@ -1,0 +1,2 @@
+Description
+This Python program analyzes trade data from New Zealand to determine the effects of COVID-19 on trade. The data is fetched from the stats.govt.nz website and is stored in a MySQL database for further analysis. The program is capable of creating several kinds of graphs, such as turnover by country, turnover by month, turnover by transport mode, turnover by weekday, and turnover by commodity category. Additionally, it highlights the top 5 commodities per country and top 5 months with the biggest turnover.
